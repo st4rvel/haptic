@@ -2,64 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TETHER — Dynamic Haptic & Visual Impact Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TETHER — F1-Style Haptic Trailer Experience</title>
   <style>
     * { box-sizing: border-box; }
     
     body {
       margin: 0;
-      background: #08080a;
-      color: #eaeaea;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #050507;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Roboto, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 16px;
       overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .container {
+    .experience-card {
       width: 100%;
-      max-width: 860px;
+      max-width: 880px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
     }
 
-    /* Screen shake container */
-    .video-viewport {
+    /* Screen shake viewport */
+    .viewport-box {
       width: 100%;
       position: relative;
-      border-radius: 12px;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9);
       transform: translate3d(0, 0, 0);
       will-change: transform;
     }
 
-    .video-wrapper {
+    .video-aspect {
+      position: relative;
       width: 100%;
-      aspect-ratio: 16 / 9;
-      background: #000;
+      padding-bottom: 56.25%; /* 16:9 */
+      height: 0;
     }
 
-    #player {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Impact flash overlay */
-    .impact-overlay {
+    .video-aspect iframe {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      border: none;
+    }
+
+    /* Dynamic Visual Shockwave / Flash */
+    .flash-overlay {
+      position: absolute;
+      inset: 0;
       pointer-events: none;
       opacity: 0;
       mix-blend-mode: screen;
@@ -67,237 +71,236 @@
       transition: opacity 0.05s ease-out;
     }
 
-    /* Hud Status Controls */
-    .haptic-panel {
-      margin-top: 18px;
+    /* Telemetry HUD (Like F1 experience) */
+    .hud-bar {
+      margin-top: 14px;
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 12px 18px;
-      background: #121217;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: #0e0e13;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .pulse-indicator {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .telemetry-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #444;
-      margin-right: 8px;
-      transition: background 0.15s ease, box-shadow 0.15s ease;
+      transition: background 0.1s, box-shadow 0.1s;
     }
 
-    .pulse-indicator.active {
-      background: #00e676;
-      box-shadow: 0 0 10px #00e676;
+    .telemetry-dot.active {
+      background: #00ff66;
+      box-shadow: 0 0 12px #00ff66;
     }
 
-    .status-text {
+    .hud-status {
       font-size: 13px;
-      font-weight: 500;
-      color: #aaa;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
     }
 
-    .feedback-label {
+    .hud-cue-tag {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 12px;
-      color: #ff9100;
-      font-family: monospace;
+      color: #ffaa00;
+      letter-spacing: 1px;
     }
 
-    .note {
-      font-size: 12px;
-      color: #666;
-      margin-top: 10px;
-      text-align: center;
+    /* Shake Profiles */
+    .shake-impact {
+      animation: f1Impact 0.35s cubic-bezier(.36,.07,.19,.97) both;
     }
-
-    /* --- Visual FX Animations --- */
-    
-    /* 1. Heavy Slam Shake (Title Drop & Starvel Slam) */
-    .shake-heavy {
-      animation: heavyShake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-    }
-
-    @keyframes heavyShake {
+    @keyframes f1Impact {
       10%, 90% { transform: translate3d(-3px, 2px, 0) scale(1.01); }
       20%, 80% { transform: translate3d(4px, -3px, 0); }
       30%, 50%, 70% { transform: translate3d(-5px, 4px, 0) scale(1.02); }
-      40%, 60% { transform: translate3d(5px, -2px, 0); }
+      40%, 60% { transform: translate3d(4px, -2px, 0); }
     }
 
-    /* 2. Snappy Pulse / Jolt (Countdown Beeps & Glitches) */
     .shake-pulse {
-      animation: pulseJolt 0.16s ease-out both;
+      animation: f1Pulse 0.14s ease-out both;
     }
-
-    @keyframes pulseJolt {
-      0% { transform: scale(1); }
-      50% { transform: scale(0.985) translate3d(0, 1px, 0); }
+    @keyframes f1Pulse {
+      50% { transform: scale(0.988) translate3d(0, 1px, 0); }
       100% { transform: scale(1) translate3d(0, 0, 0); }
     }
 
-    /* 3. Flash Overlays */
+    .flash-cyan {
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.5) 0%, rgba(0,0,0,0) 70%);
+      opacity: 1 !important;
+    }
     .flash-white {
-      background: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.45);
       opacity: 1 !important;
     }
 
-    .flash-cyan {
-      background: radial-gradient(circle, rgba(0, 229, 255, 0.45) 0%, rgba(0, 0, 0, 0) 75%);
-      opacity: 1 !important;
+    /* Hidden iOS Taptic Driver elements */
+    #ios-haptic-trigger {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- Viewport wrapper isolates the shaking effect to the player -->
-  <div class="video-viewport" id="viewport">
-    <div class="video-wrapper">
-      <div id="player"></div>
+<div class="experience-card">
+  <div class="viewport-box" id="viewport">
+    <div class="video-aspect">
+      <iframe 
+        id="player" 
+        src="https://www.youtube-nocookie.com/embed/t_P2gRGizco?enablejsapi=1&playsinline=1&rel=0&modestbranding=1" 
+        title="TETHER Teaser" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
     </div>
-    <div class="impact-overlay" id="flashOverlay"></div>
+    <div class="flash-overlay" id="flashOverlay"></div>
   </div>
 
-  <div class="haptic-panel">
-    <div>
-      <span id="indicator" class="pulse-indicator"></span>
-      <span id="status" class="status-text">Detecting device...</span>
+  <div class="hud-bar">
+    <div class="hud-left">
+      <div class="telemetry-dot" id="dot"></div>
+      <span class="hud-status" id="status">Connecting...</span>
     </div>
-    <div id="cueFeedback" class="feedback-label">STANDBY</div>
+    <div class="hud-cue-tag" id="cueTag">STANDBY</div>
   </div>
+</div>
 
-  <p class="note" id="deviceModeNote"></p>
+<!-- iOS Taptic Engine Web Bridge -->
+<div id="ios-haptic-trigger">
+  <label id="tapticLabel" for="tapticSwitch">
+    <input type="checkbox" id="tapticSwitch" switch>
+  </label>
 </div>
 
 <script>
-  const VIDEO_ID = 't_P2gRGizco';
+  const hasAndroidHaptics = 'vibrate' in navigator;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-  // Check hardware vibration support
-  const hasHaptics = 'vibrate' in navigator;
-
-  // SFX Cue Mapping with visual FX types
-  const hapticCues = [
-    { time: 7.90,  pattern: [90, 40, 60], visual: 'pulse', flash: 'cyan', label: "Hologram Boot & Sub-Bass" },
-    { time: 11.50, pattern: [40],         visual: 'pulse', flash: null,   label: "Pulse: Five" },
-    { time: 12.80, pattern: [40],         visual: 'pulse', flash: null,   label: "Pulse: Four" },
-    { time: 14.10, pattern: [40],         visual: 'pulse', flash: null,   label: "Pulse: Three" },
-    { time: 15.50, pattern: [50],         visual: 'pulse', flash: 'white',label: "Pulse: Two / Combat Hit" },
-    { time: 16.70, pattern: [60],         visual: 'pulse', flash: 'cyan', label: "Pulse: One / Distortion" },
-    { time: 18.00, pattern: [120, 40, 180], visual: 'heavy', flash: 'white',label: "STARVEL Logo Slam" },
-    { time: 24.80, pattern: [80, 50, 220],  visual: 'heavy', flash: 'white',label: "TETHER Title Hit" },
-    { time: 29.30, pattern: [25],          visual: 'pulse', flash: null,   label: "Clock Tick" }
+  // Exact SFX Cue points mapped to TETHER's audio master
+  const sfxTrack = [
+    { time: 7.90,  vibe: [90, 40, 60], pulses: 2, fx: 'pulse',  flash: 'cyan',  tag: "HOLOGRAM INIT" },
+    { time: 11.50, vibe: [40],         pulses: 1, fx: 'pulse',  flash: null,    tag: "COUNTDOWN: 5" },
+    { time: 12.80, vibe: [40],         pulses: 1, fx: 'pulse',  flash: null,    tag: "COUNTDOWN: 4" },
+    { time: 14.10, vibe: [40],         pulses: 1, fx: 'pulse',  flash: null,    tag: "COUNTDOWN: 3" },
+    { time: 15.50, vibe: [50],         pulses: 1, fx: 'pulse',  flash: 'white', tag: "WARP SHIFT: 2" },
+    { time: 16.70, vibe: [70],         pulses: 2, fx: 'pulse',  flash: 'cyan',  tag: "WARP SHIFT: 1" },
+    { time: 18.00, vibe: [140, 40, 180], pulses: 3, fx: 'impact', flash: 'white', tag: "STARVEL LOGO SLAM" },
+    { time: 24.80, vibe: [90, 40, 240],  pulses: 3, fx: 'impact', flash: 'white', tag: "TETHER TITLE SLAM" },
+    { time: 29.30, vibe: [30],         pulses: 1, fx: 'pulse',  flash: null,    tag: "TEMPORAL TICK" }
   ];
 
   let player;
-  let animFrameId = null;
-
-  // Set mode messaging on load
-  const noteEl = document.getElementById('deviceModeNote');
+  let syncClock = null;
+  const tapticLabel = document.getElementById('tapticLabel');
+  const viewport = document.getElementById('viewport');
+  const flashOverlay = document.getElementById('flashOverlay');
+  const dot = document.getElementById('dot');
   const statusEl = document.getElementById('status');
-  if (hasHaptics) {
-    noteEl.textContent = "Mode: Hardware Vibration Active (Android / Supported browser).";
-    statusEl.textContent = "Haptics: Ready";
-  } else {
-    noteEl.textContent = "Mode: Visual Haptic Fallback Active (Screen-shake & flash enabled for iOS/Desktop).";
-    statusEl.textContent = "Visual Fallback: Ready";
-  }
+  const cueTag = document.getElementById('cueTag');
 
-  // Load YouTube IFrame API
+  // Load YouTube API
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
 
   function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
-      videoId: VIDEO_ID,
-      playerVars: {
-        'playsinline': 1,
-        'rel': 0,
-        'modestbranding': 1
-      },
       events: {
-        'onStateChange': onPlayerStateChange
+        'onReady': () => {
+          statusEl.textContent = isIOS ? "Engine: iOS Taptic Ready" : "Engine: Ready";
+        },
+        'onStateChange': onStateChange
       }
     });
   }
 
-  function triggerImpact(cue) {
-    // 1. Physical Haptics (Android/Supported)
-    if (hasHaptics) {
-      navigator.vibrate(cue.pattern);
+  // Cross-Platform Haptic Dispatcher
+  function fireHaptic(cue) {
+    // 1. Android physical vibration
+    if (hasAndroidHaptics) {
+      try { navigator.vibrate(cue.vibe); } catch(e){}
     }
 
-    // 2. Visual Haptics (Runs on iOS, Desktop, and reinforces Android)
-    const viewport = document.getElementById('viewport');
-    const overlay = document.getElementById('flashOverlay');
-
-    // Remove existing animation classes to re-trigger cleanly
-    viewport.classList.remove('shake-heavy', 'shake-pulse');
-    overlay.className = 'impact-overlay';
-
-    // Force reflow so rapid triggers register immediately
-    void viewport.offsetWidth;
-
-    if (cue.visual === 'heavy') {
-      viewport.classList.add('shake-heavy');
-    } else if (cue.visual === 'pulse') {
-      viewport.classList.add('shake-pulse');
+    // 2. iOS Taptic Engine Driver (Triggers system switch haptic burst)
+    if (isIOS && tapticLabel) {
+      for (let i = 0; i < cue.pulses; i++) {
+        setTimeout(() => {
+          tapticLabel.click();
+        }, i * 70);
+      }
     }
+
+    // 3. F1-Style Visual camera shake & light bursts
+    viewport.classList.remove('shake-impact', 'shake-pulse');
+    flashOverlay.className = 'flash-overlay';
+    void viewport.offsetWidth; // Force reflow
+
+    if (cue.fx === 'impact') viewport.classList.add('shake-impact');
+    if (cue.fx === 'pulse') viewport.classList.add('shake-pulse');
 
     if (cue.flash === 'white') {
-      overlay.classList.add('flash-white');
-      setTimeout(() => overlay.classList.remove('flash-white'), 100);
+      flashOverlay.classList.add('flash-white');
+      setTimeout(() => flashOverlay.classList.remove('flash-white'), 110);
     } else if (cue.flash === 'cyan') {
-      overlay.classList.add('flash-cyan');
-      setTimeout(() => overlay.classList.remove('flash-cyan'), 120);
+      flashOverlay.classList.add('flash-cyan');
+      setTimeout(() => flashOverlay.classList.remove('flash-cyan'), 130);
     }
 
-    // HUD Indicator
-    const indicator = document.getElementById('indicator');
-    const feedback = document.getElementById('cueFeedback');
-    indicator.classList.add('active');
-    feedback.textContent = cue.label.toUpperCase();
-
-    setTimeout(() => {
-      indicator.classList.remove('active');
-    }, 150);
+    // HUD Telemetry blip
+    dot.classList.add('active');
+    cueTag.textContent = cue.tag;
+    setTimeout(() => dot.classList.remove('active'), 180);
   }
 
-  function syncLoop() {
+  // 60FPS sync engine
+  function runSyncLoop() {
     if (!player || typeof player.getCurrentTime !== 'function') return;
 
-    const currentTime = player.getCurrentTime();
+    try {
+      const now = player.getCurrentTime();
 
-    hapticCues.forEach(cue => {
-      if (!cue.triggered && currentTime >= cue.time && currentTime < cue.time + 0.12) {
-        triggerImpact(cue);
-        cue.triggered = true;
-      }
+      sfxTrack.forEach(cue => {
+        if (!cue.triggered && now >= cue.time && now < cue.time + 0.12) {
+          fireHaptic(cue);
+          cue.triggered = true;
+        }
+        if (now < cue.time - 0.25) {
+          cue.triggered = false;
+        }
+      });
+    } catch(err){}
 
-      if (currentTime < cue.time - 0.2) {
-        cue.triggered = false;
-      }
-    });
-
-    animFrameId = requestAnimationFrame(syncLoop);
+    syncClock = requestAnimationFrame(runSyncLoop);
   }
 
-  function onPlayerStateChange(event) {
+  function onStateChange(event) {
     if (event.data === YT.PlayerState.PLAYING) {
-      statusEl.textContent = hasHaptics ? "Haptics: Active & Synced" : "Visual Fallback: Active";
-      if (!animFrameId) {
-        animFrameId = requestAnimationFrame(syncLoop);
-      }
+      statusEl.textContent = "HAPTICS SYNCED";
+      if (!syncClock) syncClock = requestAnimationFrame(runSyncLoop);
     } else {
-      if (animFrameId) {
-        cancelAnimationFrame(animFrameId);
-        animFrameId = null;
+      if (syncClock) {
+        cancelAnimationFrame(syncClock);
+        syncClock = null;
       }
-      statusEl.textContent = event.data === YT.PlayerState.PAUSED ? "Paused" : "Standby";
+      statusEl.textContent = event.data === YT.PlayerState.PAUSED ? "PAUSED" : "STANDBY";
     }
   }
 </script>
